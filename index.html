@@ -171,60 +171,63 @@
   
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
-    const liffId = "2008220810-d7jvb936"; // ⚠️ เปลี่ยนเป็น LIFF ID ของคุณ
-    
+    const liffId = "2008220810-d7jvb936";
+
     async function main() {
-      await liff.init({ liffId });
-      const profile = await liff.getProfile();
-      const userId = profile.userId;
-      const form = document.getElementById("physioForm");
-      
-      // ตั้งค่าวันที่เป็นวันปัจจุบัน
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById("dateTime").value = today;
-      
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+      try {
+        await liff.init({ liffId });
         
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        submitBtn.textContent = "⏳ กำลังส่งข้อมูล...";
-        submitBtn.disabled = true;
+        if (!liff.isLoggedIn()) {
+          liff.login();
+          return;
+        }
         
-        const data = {
-          fullName: document.getElementById("fullName").value,
-          nickname: document.getElementById("nickname").value,
-          symptom: document.getElementById("symptom").value,
-          disease: document.getElementById("disease").value,
-          dateTime: document.getElementById("dateTime").value,
-          timeSlot: document.getElementById("timeSlot").value,
-          userId: userId
-        };
+        const profile = await liff.getProfile();
+        const userId = profile.userId;
+        const form = document.getElementById("physioForm");
         
-        try {
-          const response = await fetch("https://script.google.com/macros/s/AKfycbzZd1rKnI0N6LtfZw882l13QXNZss04AWLK8olh_dYAt__OsOZ_jetYnkLoZupaX5XNxA/exec", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(data)
-          });
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById("dateTime").value = today;
+        
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
           
-          const result = await response.json();
+          const submitBtn = e.target.querySelector('button[type="submit"]');
+          submitBtn.textContent = "⏳ กำลังส่งข้อมูล...";
+          submitBtn.disabled = true;
           
-          if(result.status === "success"){
+          const data = {
+            fullName: document.getElementById("fullName").value,
+            nickname: document.getElementById("nickname").value,
+            symptom: document.getElementById("symptom").value,
+            disease: document.getElementById("disease").value,
+            dateTime: document.getElementById("dateTime").value,
+            timeSlot: document.getElementById("timeSlot").value,
+            userId: userId
+          };
+          
+          try {
+            await fetch("https://script.google.com/macros/s/AKfycbz1vPPX84ZmgGJr1ig71cKW4bfEzbA9ziwvbJ91bNMDFyHUgfxrtaZQwCScb4WBmR3WvQ/exec", {
+              method: "POST",
+              headers: {"Content-Type": "text/plain"},
+              body: JSON.stringify(data)
+            });
+            
             alert("✅ ขอบคุณที่กรอกข้อมูล รอแอดมินยืนยันเวลาอีกครั้งค่ะ");
             liff.closeWindow();
-          } else {
-            alert("❌ เกิดข้อผิดพลาด: " + result.message);
+            
+          } catch (error) {
+            alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง");
             submitBtn.textContent = "✨ ส่งข้อมูล";
             submitBtn.disabled = false;
           }
-        } catch (error) {
-          alert("❌ ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง");
-          submitBtn.textContent = "✨ ส่งข้อมูล";
-          submitBtn.disabled = false;
-        }
-      });
+        });
+        
+      } catch (error) {
+        alert("❌ ระบบไม่สามารถทำงานได้: " + error.message);
+      }
     }
-    
+
     main();
   </script>
 </body>
