@@ -197,13 +197,12 @@
           
           const appointmentData = {
             userId: profile.userId,
-            displayName: profile.displayName,
-            pictureUrl: profile.pictureUrl || '',
-            name: document.getElementById("fullName").value,
-            symptoms: document.getElementById("symptom").value,
-            medication: document.getElementById("disease").value,
-            appointmentDate: document.getElementById("dateTime").value,
-            appointmentTime: document.getElementById("timeSlot").value
+            fullName: document.getElementById("fullName").value,
+            nickname: document.getElementById("nickname").value,
+            symptom: document.getElementById("symptom").value,
+            disease: document.getElementById("disease").value,
+            dateTime: document.getElementById("dateTime").value,
+            timeSlot: document.getElementById("timeSlot").value
           };
           
           console.log('Sending data:', appointmentData);
